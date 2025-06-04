@@ -8,7 +8,7 @@
 import Foundation
 import CoreLocation
 
-struct Restaurant: Identifiable, Codable, Equatable {
+struct Restaurant: Identifiable, Codable, Equatable, Hashable {
     var id: String { placeID }
     let name: String
     let address: String
@@ -18,7 +18,7 @@ struct Restaurant: Identifiable, Codable, Equatable {
     var visits: [Visit]
 }
 
-struct Visit: Identifiable, Codable, Equatable {
+struct Visit: Identifiable, Codable, Equatable, Hashable {
     let id: UUID
     let date: Date
     var dishes: [Dish]
@@ -31,7 +31,7 @@ struct Visit: Identifiable, Codable, Equatable {
     }
 }
 
-struct Dish: Identifiable, Codable, Equatable {
+struct Dish: Identifiable, Codable, Equatable, Hashable {
     let id: UUID
     let name: String
     let orderedBy: String

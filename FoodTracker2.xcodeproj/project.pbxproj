@@ -34,17 +34,29 @@
 		38EAF1E72DE548C100D4EA9E /* Exceptions for "FoodTracker2" folder in "FoodTracker2" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
+				ImHereView.save,
 				Info.plist,
 			);
 			target = 38EAF1AC2DE3F8AA00D4EA9E /* FoodTracker2 */;
 		};
 /* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
 
+/* Begin PBXFileSystemSynchronizedGroupBuildPhaseMembershipExceptionSet section */
+		38C160392DF1059F00E8536A /* Exceptions for "FoodTracker2" folder in "Compile Sources" phase from "FoodTracker2" target */ = {
+			isa = PBXFileSystemSynchronizedGroupBuildPhaseMembershipExceptionSet;
+			buildPhase = 38EAF1A92DE3F8AA00D4EA9E /* Sources */;
+			membershipExceptions = (
+				ImHereView.save,
+			);
+		};
+/* End PBXFileSystemSynchronizedGroupBuildPhaseMembershipExceptionSet section */
+
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		38EAF1AF2DE3F8AA00D4EA9E /* FoodTracker2 */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			exceptions = (
 				38EAF1E72DE548C100D4EA9E /* Exceptions for "FoodTracker2" folder in "FoodTracker2" target */,
+				38C160392DF1059F00E8536A /* Exceptions for "FoodTracker2" folder in "Compile Sources" phase from "FoodTracker2" target */,
 			);
 			path = FoodTracker2;
 			sourceTree = "<group>";

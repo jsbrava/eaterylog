@@ -9,77 +9,98 @@
 import SwiftUI
 
 struct RestaurantDetailView: View {
-    let restaurant: Restaurant
+    @ObservedObject var restaurantStore: RestaurantStore
+    @State var restaurant: Restaurant
 
-    // Helper to get the last 5 visits, most recent first
-    var recentVisits: [Visit] {
-        restaurant.visits
-            .sorted { $0.date > $1.date }
-            .prefix(5)
-            .map { $0 }
-    }
+    // New dish input
+    @State private var dishName = ""
+    @State private var orderedBy = ""
+    @State private var notes = ""
+    @State private var rating = 0
+
+    // List of new dishes for this visit
+    @State private var newDishes: [Dish] = []
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 16) {
-            // Restaurant Name
+        VStack(alignment: .leading) {
             Text(restaurant.name)
-                .font(.largeTitle)
-                .fontWeight(.bold)
+                .font(.title)
+                .padding(.bottom)
 
-            // Address
             Text(restaurant.address)
+                .font(.subheadline)
+                .padding(.bottom)
+
+            Text("Previous Visits")
                 .font(.headline)
-                .foregroundColor(.secondary)
-
-            Divider()
-
-            // Visits Section
-            Text("Recent Visits")
-                .font(.title2)
-                .fontWeight(.semibold)
-
-            if recentVisits.isEmpty {
-                Text("No visits recorded yet")
-                    .italic()
-                    .foregroundColor(.secondary)
-            } else {
-                ForEach(recentVisits) { visit in
-                    VStack(alignment: .leading, spacing: 8) {
-                        Text("Visited: \(dateString(visit.date))")
-                            .font(.subheadline)
-                            .foregroundColor(.blue)
-
-                        if visit.dishes.isEmpty {
-                            Text("No dishes recorded for this visit")
+            List(restaurant.visits.suffix(5)) { visit in
+                VStack(alignment: .leading) {
+                    Text("Visit on \(visit.date.formatted(.dateTime.month().day().year()))")
+                        .font(.subheadline)
+                    ForEach(visit.dishes) { dish in
+                        HStack {
+                            Text(dish.name)
+                                .bold()
+                            Text("- \(dish.orderedBy)")
                                 .italic()
-                                .foregroundColor(.secondary)
-                        } else {
-                            ForEach(visit.dishes) { dish in
-                                HStack {
-                                    Text(dish.name)
-                                    Spacer()
-                                    Text("⭐️ \(dish.rating)")
-                                        .foregroundColor(.orange)
-                                }
-                            }
+                            Spacer()
+                            Text("⭐️ \(dish.rating)")
                         }
+                        Text(dish.notes)
+                            .font(.caption)
                     }
-                    .padding(.vertical, 6)
-                    Divider()
                 }
             }
+            .frame(height: 200)
+
+            Divider()
+                .padding(.vertical)
+
+            // Fields for new dish
+            Text("Add a Dish to This Visit")
+                .font(.headline)
+            TextField("Dish Name", text: $dishName)
+                .textFieldStyle(.roundedBorder)
+            TextField("Ordered By", text: $orderedBy)
+                .textFieldStyle(.roundedBorder)
+            TextField("Notes", text: $notes)
+                .textFieldStyle(.roundedBorder)
+            Stepper("Rating: \(rating)", value: $rating, in: 0...5)
+
+            Button("Add Dish") {
+                let newDish = Dish(name: dishName, orderedBy: orderedBy, notes: notes, rating: rating)
+                newDishes.append(newDish)
+                dishName = ""
+                orderedBy = ""
+                notes = ""
+                rating = 0
+            }
+            .padding(.vertical)
+
+            // Show new dishes before saving visit
+            if !newDishes.isEmpty {
+                Text("Dishes for This Visit:")
+                    .font(.subheadline)
+                ForEach(newDishes) { dish in
+                    HStack {
+                        Text(dish.name)
+                        Spacer()
+                        Text("⭐️ \(dish.rating)")
+                    }
+                }
+            }
+
+            Button("Save Visit") {
+                let newVisit = Visit(date: Date(), dishes: newDishes)
+                restaurantStore.addVisit(to: restaurant, visit: newVisit)
+                restaurant = restaurantStore.restaurants.first(where: { $0.id == restaurant.id }) ?? restaurant
+                newDishes = []
+            }
+            .disabled(newDishes.isEmpty)
+            .padding(.top)
 
             Spacer()
         }
         .padding()
-        .navigationTitle("Restaurant Details")
-        .navigationBarTitleDisplayMode(.inline)
-    }
-
-    // Helper for formatting dates
-    func dateString(_ date: Date) -> String {
-        let formatter = DateFormatter()
-        formatter.dateStyle = .medium
-        return formatter.string(from: date)
     }
 }

@@ -8,37 +8,49 @@
 
 import Foundation
 import CoreLocation
+import Combine
 
 class RestaurantStore: ObservableObject {
     @Published var restaurants: [Restaurant] = []
+    private var cancellables = Set<AnyCancellable>()
+    private let savePath = FileManager.default
+            .urls(for: .documentDirectory, in: .userDomainMask)[0]
+            .appendingPathComponent("restaurants.json")
     
     init() {
-        restaurants = [
-            Restaurant(
-                name: "Sushi Ota",
-                address: "4529 Mission Bay Dr, San Diego, CA 92109",
-                latitude: 32.814091,
-                longitude: -117.215079,
-                placeID: "",
-                visits: [
-                    Visit(
-                        date: Date(),
-                        dishes: [
-                            Dish(name: "Salmon Nigiri", orderedBy: "Jim", notes: "Excellent, very fresh!", rating: 5),
-                            Dish(name: "Eel Roll", orderedBy: "Jane", notes: "Good, but a bit sweet.", rating: 4)
-                        ]
-                    )
-                ]
-            ),
-            Restaurant(
-                name: "Poseidon",
-                address: "1670 Coast Blvd, Del Mar, CA 92014",
-                latitude: 32.959386,
-                longitude: -117.266305,
-                placeID: "",
-                visits: []
-            )
-        ]
+        load()
+        if restaurants.isEmpty {
+            restaurants = [
+                Restaurant(
+                    name: "Sushi Ota",
+                    address: "4529 Mission Bay Dr, San Diego, CA 92109",
+                    latitude: 32.814091,
+                    longitude: -117.215079,
+                    placeID: "",
+                    visits: [
+                        Visit(
+                            date: Date(),
+                            dishes: [
+                                Dish(name: "Salmon Nigiri", orderedBy: "Jim", notes: "Excellent, very fresh!", rating: 5),
+                                Dish(name: "Eel Roll", orderedBy: "Jane", notes: "Good, but a bit sweet.", rating: 4)
+                            ]
+                        )
+                    ]
+                ),
+                Restaurant(
+                    name: "Poseidon",
+                    address: "1670 Coast Blvd, Del Mar, CA 92014",
+                    latitude: 32.959386,
+                    longitude: -117.266305,
+                    placeID: "",
+                    visits: []
+                )
+            ]
+        }
+        // Combine: autosave when restaurants changes
+        $restaurants
+            .sink { [weak self] _ in self?.save() }
+            .store(in: &cancellables)
     }
     func addRestaurantIfNeeded(from suggestion: PlaceSuggestion, completion: @escaping (Restaurant?) -> Void) {
         // Check for existing restaurant
@@ -61,6 +73,32 @@ class RestaurantStore: ObservableObject {
                 self.restaurants.append(newRestaurant)
                 completion(newRestaurant)
             }
+        }
+    }
+    func addVisit(to restaurant: Restaurant, visit: Visit) {
+        // Find the index of the restaurant in the array
+        if let index = restaurants.firstIndex(where: { $0.id == restaurant.id }) {
+            restaurants[index].visits.append(visit)
+            save() // <-- if you have a save() method for persistence
+        }
+    }
+    // Load restaurants from disk
+    func load() {
+        do {
+            let data = try Data(contentsOf: savePath)
+            let decoded = try JSONDecoder().decode([Restaurant].self, from: data)
+            self.restaurants = decoded
+        } catch {
+            print("Failed to load restaurants: \(error)")
+        }
+    }
+    // Save restaurants to disk
+    func save() {
+        do {
+            let data = try JSONEncoder().encode(restaurants)
+            try data.write(to: savePath)
+        } catch {
+            print("Failed to save restaurants: \(error)")
         }
     }
     

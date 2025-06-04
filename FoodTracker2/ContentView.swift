@@ -12,33 +12,21 @@ struct ContentView: View {
     @State private var selectedRestaurant: Restaurant? = nil
     @StateObject var restaurantStore = RestaurantStore()
     @StateObject var viewModel = PlacesAutocompleteViewModel()
-    
+
     var body: some View {
-        NavigationView {
+        NavigationStack {
             VStack {
                 NearbyRestaurantsView(viewModel: viewModel) { suggestion in
+                    // ASYNC: Add to store, then set selection in the completion
                     restaurantStore.addRestaurantIfNeeded(from: suggestion) { restaurant in
                         selectedRestaurant = restaurant
                     }
                 }
-                // Invisible NavigationLink for programmatic navigation
-                NavigationLink(
-                    destination: {
-                        if let restaurant = selectedRestaurant {
-                            AnyView(RestaurantDetailView(restaurant: restaurant))
-                        } else {
-                            AnyView(EmptyView())
-                        }
-                    }(),
-                    isActive: Binding(
-                        get: { selectedRestaurant != nil },
-                        set: { active in if !active { selectedRestaurant = nil } }
-                    )
-                ) {
-                    EmptyView()
-                }
             }
             .navigationTitle("Select Restaurant")
+            .navigationDestination(item: $selectedRestaurant) { restaurant in
+                RestaurantDetailView(restaurantStore: restaurantStore, restaurant: restaurant)
+            }
         }
     }
 }
