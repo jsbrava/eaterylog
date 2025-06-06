@@ -30,7 +30,10 @@ class LocationManager: NSObject, ObservableObject, CLLocationManagerDelegate {
     
     // Delegate: update the published location
     func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
-        location = locations.last
+        self.location = locations.last
+//        if let loc = locations.last {
+//                print("User location: \(loc.coordinate.latitude), \(loc.coordinate.longitude)")
+//            }
     }
 
     // Delegate: update the published authorization status

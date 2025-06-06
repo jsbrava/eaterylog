@@ -82,7 +82,7 @@ class PlacesAutocompleteViewModel: ObservableObject {
         let lat = location.coordinate.latitude
         let lng = location.coordinate.longitude
         let urlString =
-            "https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=\(lat),\(lng)&radius=1600&type=restaurant&key=\(apiKey)"
+            "https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=\(lat),\(lng)&rankby=distance&type=restaurant&key=\(apiKey)"
         guard let url = URL(string: urlString) else { return }
 
         URLSession.shared.dataTask(with: url) { data, response, error in
@@ -94,7 +94,7 @@ class PlacesAutocompleteViewModel: ObservableObject {
             do {
                 if let json = try JSONSerialization.jsonObject(with: data) as? [String: Any],
                    let results = json["results"] as? [[String: Any]] {
-                    let suggestions: [PlaceSuggestion] = results.prefix(5).compactMap { place in
+                    let suggestions: [PlaceSuggestion] = results.prefix(8).compactMap { place in
                         guard let name = place["name"] as? String,
                               let placeID = place["place_id"] as? String else { return nil }
                         return PlaceSuggestion(description: name, placeID: placeID)
