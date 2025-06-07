@@ -138,4 +138,39 @@ class PlacesAutocompleteViewModel: ObservableObject {
             }
         }.resume()
     }
+    func searchRestaurants(query: String, completion: @escaping ([PlaceSuggestion]) -> Void) {
+        let queryEncoded = query.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) ?? ""
+        let urlString = "https://maps.googleapis.com/maps/api/place/autocomplete/json?input=\(queryEncoded)&types=establishment&key=\(apiKey)"
+        guard let url = URL(string: urlString) else {
+            completion([])
+            return
+        }
+        URLSession.shared.dataTask(with: url) { data, response, error in
+            if let error = error {
+                print("Search error: \(error)")
+                completion([])
+                return
+            }
+            guard let data = data else {
+                completion([])
+                return
+            }
+            do {
+                if let json = try JSONSerialization.jsonObject(with: data) as? [String: Any],
+                   let predictions = json["predictions"] as? [[String: Any]] {
+                    let suggestions = predictions.prefix(5).compactMap { place -> PlaceSuggestion? in
+                        guard let description = place["description"] as? String,
+                              let placeID = place["place_id"] as? String else { return nil }
+                        return PlaceSuggestion(description: description, placeID: placeID)
+                    }
+                    completion(suggestions)
+                } else {
+                    completion([])
+                }
+            } catch {
+                print("JSON parse error: \(error)")
+                completion([])
+            }
+        }.resume()
+    }
 }
