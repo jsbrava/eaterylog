@@ -22,10 +22,11 @@ struct NearbyRestaurantsView: View {
     var onSelect: (PlaceSuggestion) -> Void
 
     var body: some View {
-        VStack(alignment: .leading) {
+        VStack(alignment: .center, spacing: 16) {
+            
             Text("Nearby Restaurants")
-                .font(.headline)
-                .padding(.top)
+                .font(.title2)
+                .fontWeight(.semibold)
 
             if let _ = locationManager.location {
                 List(viewModel.suggestions, id: \.placeID) { suggestion in
@@ -39,25 +40,30 @@ struct NearbyRestaurantsView: View {
             } else {
                 ProgressView("Getting your location...")
             }
-
+            
             Divider()
                 .padding(.vertical, 8)
-
+                
             Text("Can't find it? Search:")
-                .font(.subheadline)
+                .font(.title2)
+                .fontWeight(.semibold)
             HStack {
                 TextField("Enter restaurant name...", text: $searchQuery, onCommit: {
                     searchRestaurants()
                 })
+                .font(.title2)
                 .textFieldStyle(RoundedBorderTextFieldStyle())
                 .autocapitalization(.none)
                 .disableAutocorrection(true)
+                .multilineTextAlignment(.center)
                 
                 if isSearching {
                     ProgressView()
                         .scaleEffect(0.7)
                 }
+                Spacer()
             }
+            .frame(maxWidth: .infinity) // Ensures HStack takes full width
             .padding(.bottom, 2)
 
             if !searchResults.isEmpty {
@@ -70,7 +76,9 @@ struct NearbyRestaurantsView: View {
                 }
                 .frame(height: CGFloat(searchResults.count * 44 + 10)) // adjust if needed
             }
+            
         }
+        .offset(y: -40)
         .onAppear {
             if !hasFetched {
                 hasFetched = true
@@ -88,6 +96,7 @@ struct NearbyRestaurantsView: View {
         }
     }
 
+    
     private func searchRestaurants() {
         guard !searchQuery.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else {
             searchResults = []
@@ -101,4 +110,5 @@ struct NearbyRestaurantsView: View {
             }
         }
     }
+    
 }

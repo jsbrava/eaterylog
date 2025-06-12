@@ -8,7 +8,7 @@
 import SwiftUI
 
 @main
-struct FoodTracker2App: App {
+struct EateryLogApp: App {
     @StateObject private var store = RestaurantStore()
     var body: some Scene {
         WindowGroup {

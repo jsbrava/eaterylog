@@ -24,25 +24,24 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
-		38EAF1AD2DE3F8AA00D4EA9E /* FoodTracker2.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = FoodTracker2.app; sourceTree = BUILT_PRODUCTS_DIR; };
-		38EAF1BA2DE3F8AC00D4EA9E /* FoodTracker2Tests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = FoodTracker2Tests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
-		38EAF1C42DE3F8AC00D4EA9E /* FoodTracker2UITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = FoodTracker2UITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
-		38EAF1E32DE53F9E00D4EA9E /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		38EAF1AD2DE3F8AA00D4EA9E /* EateryLog.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = EateryLog.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		38EAF1BA2DE3F8AC00D4EA9E /* EateryLogTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = EateryLogTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		38EAF1C42DE3F8AC00D4EA9E /* EateryLogUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = EateryLogUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
-		38EAF1E72DE548C100D4EA9E /* Exceptions for "FoodTracker2" folder in "FoodTracker2" target */ = {
+		38EAF1E72DE548C100D4EA9E /* Exceptions for "EateryLog" folder in "EateryLog" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
 				ImHereView.save,
 				Info.plist,
 			);
-			target = 38EAF1AC2DE3F8AA00D4EA9E /* FoodTracker2 */;
+			target = 38EAF1AC2DE3F8AA00D4EA9E /* EateryLog */;
 		};
 /* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
 
 /* Begin PBXFileSystemSynchronizedGroupBuildPhaseMembershipExceptionSet section */
-		38C160392DF1059F00E8536A /* Exceptions for "FoodTracker2" folder in "Compile Sources" phase from "FoodTracker2" target */ = {
+		38C160392DF1059F00E8536A /* Exceptions for "EateryLog" folder in "Compile Sources" phase from "EateryLog" target */ = {
 			isa = PBXFileSystemSynchronizedGroupBuildPhaseMembershipExceptionSet;
 			buildPhase = 38EAF1A92DE3F8AA00D4EA9E /* Sources */;
 			membershipExceptions = (
@@ -52,18 +51,18 @@
 /* End PBXFileSystemSynchronizedGroupBuildPhaseMembershipExceptionSet section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
-		38EAF1AF2DE3F8AA00D4EA9E /* FoodTracker2 */ = {
+		38EAF1AF2DE3F8AA00D4EA9E /* EateryLog */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			exceptions = (
-				38EAF1E72DE548C100D4EA9E /* Exceptions for "FoodTracker2" folder in "FoodTracker2" target */,
-				38C160392DF1059F00E8536A /* Exceptions for "FoodTracker2" folder in "Compile Sources" phase from "FoodTracker2" target */,
+				38EAF1E72DE548C100D4EA9E /* Exceptions for "EateryLog" folder in "EateryLog" target */,
+				38C160392DF1059F00E8536A /* Exceptions for "EateryLog" folder in "Compile Sources" phase from "EateryLog" target */,
 			);
-			path = FoodTracker2;
+			path = EateryLog;
 			sourceTree = "<group>";
 		};
-		38EAF1BD2DE3F8AC00D4EA9E /* FoodTracker2Tests */ = {
+		38EAF1BD2DE3F8AC00D4EA9E /* EateryLogTests */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
-			path = FoodTracker2Tests;
+			path = EateryLogTests;
 			sourceTree = "<group>";
 		};
 		38EAF1C72DE3F8AC00D4EA9E /* FoodTracker2UITests */ = {
@@ -101,9 +100,8 @@
 		38EAF1A42DE3F8AA00D4EA9E = {
 			isa = PBXGroup;
 			children = (
-				38EAF1E32DE53F9E00D4EA9E /* Info.plist */,
-				38EAF1AF2DE3F8AA00D4EA9E /* FoodTracker2 */,
-				38EAF1BD2DE3F8AC00D4EA9E /* FoodTracker2Tests */,
+				38EAF1AF2DE3F8AA00D4EA9E /* EateryLog */,
+				38EAF1BD2DE3F8AC00D4EA9E /* EateryLogTests */,
 				38EAF1C72DE3F8AC00D4EA9E /* FoodTracker2UITests */,
 				38EAF1AE2DE3F8AA00D4EA9E /* Products */,
 			);
@@ -112,9 +110,9 @@
 		38EAF1AE2DE3F8AA00D4EA9E /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				38EAF1AD2DE3F8AA00D4EA9E /* FoodTracker2.app */,
-				38EAF1BA2DE3F8AC00D4EA9E /* FoodTracker2Tests.xctest */,
-				38EAF1C42DE3F8AC00D4EA9E /* FoodTracker2UITests.xctest */,
+				38EAF1AD2DE3F8AA00D4EA9E /* EateryLog.app */,
+				38EAF1BA2DE3F8AC00D4EA9E /* EateryLogTests.xctest */,
+				38EAF1C42DE3F8AC00D4EA9E /* EateryLogUITests.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -122,9 +120,9 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
-		38EAF1AC2DE3F8AA00D4EA9E /* FoodTracker2 */ = {
+		38EAF1AC2DE3F8AA00D4EA9E /* EateryLog */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 38EAF1CE2DE3F8AC00D4EA9E /* Build configuration list for PBXNativeTarget "FoodTracker2" */;
+			buildConfigurationList = 38EAF1CE2DE3F8AC00D4EA9E /* Build configuration list for PBXNativeTarget "EateryLog" */;
 			buildPhases = (
 				38EAF1A92DE3F8AA00D4EA9E /* Sources */,
 				38EAF1AA2DE3F8AA00D4EA9E /* Frameworks */,
@@ -135,18 +133,18 @@
 			dependencies = (
 			);
 			fileSystemSynchronizedGroups = (
-				38EAF1AF2DE3F8AA00D4EA9E /* FoodTracker2 */,
+				38EAF1AF2DE3F8AA00D4EA9E /* EateryLog */,
 			);
-			name = FoodTracker2;
+			name = EateryLog;
 			packageProductDependencies = (
 			);
 			productName = FoodTracker2;
-			productReference = 38EAF1AD2DE3F8AA00D4EA9E /* FoodTracker2.app */;
+			productReference = 38EAF1AD2DE3F8AA00D4EA9E /* EateryLog.app */;
 			productType = "com.apple.product-type.application";
 		};
-		38EAF1B92DE3F8AC00D4EA9E /* FoodTracker2Tests */ = {
+		38EAF1B92DE3F8AC00D4EA9E /* EateryLogTests */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 38EAF1D12DE3F8AC00D4EA9E /* Build configuration list for PBXNativeTarget "FoodTracker2Tests" */;
+			buildConfigurationList = 38EAF1D12DE3F8AC00D4EA9E /* Build configuration list for PBXNativeTarget "EateryLogTests" */;
 			buildPhases = (
 				38EAF1B62DE3F8AC00D4EA9E /* Sources */,
 				38EAF1B72DE3F8AC00D4EA9E /* Frameworks */,
@@ -158,18 +156,18 @@
 				38EAF1BC2DE3F8AC00D4EA9E /* PBXTargetDependency */,
 			);
 			fileSystemSynchronizedGroups = (
-				38EAF1BD2DE3F8AC00D4EA9E /* FoodTracker2Tests */,
+				38EAF1BD2DE3F8AC00D4EA9E /* EateryLogTests */,
 			);
-			name = FoodTracker2Tests;
+			name = EateryLogTests;
 			packageProductDependencies = (
 			);
 			productName = FoodTracker2Tests;
-			productReference = 38EAF1BA2DE3F8AC00D4EA9E /* FoodTracker2Tests.xctest */;
+			productReference = 38EAF1BA2DE3F8AC00D4EA9E /* EateryLogTests.xctest */;
 			productType = "com.apple.product-type.bundle.unit-test";
 		};
-		38EAF1C32DE3F8AC00D4EA9E /* FoodTracker2UITests */ = {
+		38EAF1C32DE3F8AC00D4EA9E /* EateryLogUITests */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 38EAF1D42DE3F8AC00D4EA9E /* Build configuration list for PBXNativeTarget "FoodTracker2UITests" */;
+			buildConfigurationList = 38EAF1D42DE3F8AC00D4EA9E /* Build configuration list for PBXNativeTarget "EateryLogUITests" */;
 			buildPhases = (
 				38EAF1C02DE3F8AC00D4EA9E /* Sources */,
 				38EAF1C12DE3F8AC00D4EA9E /* Frameworks */,
@@ -183,11 +181,11 @@
 			fileSystemSynchronizedGroups = (
 				38EAF1C72DE3F8AC00D4EA9E /* FoodTracker2UITests */,
 			);
-			name = FoodTracker2UITests;
+			name = EateryLogUITests;
 			packageProductDependencies = (
 			);
 			productName = FoodTracker2UITests;
-			productReference = 38EAF1C42DE3F8AC00D4EA9E /* FoodTracker2UITests.xctest */;
+			productReference = 38EAF1C42DE3F8AC00D4EA9E /* EateryLogUITests.xctest */;
 			productType = "com.apple.product-type.bundle.ui-testing";
 		};
 /* End PBXNativeTarget section */
@@ -213,7 +211,7 @@
 					};
 				};
 			};
-			buildConfigurationList = 38EAF1A82DE3F8AA00D4EA9E /* Build configuration list for PBXProject "FoodTracker2" */;
+			buildConfigurationList = 38EAF1A82DE3F8AA00D4EA9E /* Build configuration list for PBXProject "EateryLog" */;
 			developmentRegion = en;
 			hasScannedForEncodings = 0;
 			knownRegions = (
@@ -227,9 +225,9 @@
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				38EAF1AC2DE3F8AA00D4EA9E /* FoodTracker2 */,
-				38EAF1B92DE3F8AC00D4EA9E /* FoodTracker2Tests */,
-				38EAF1C32DE3F8AC00D4EA9E /* FoodTracker2UITests */,
+				38EAF1AC2DE3F8AA00D4EA9E /* EateryLog */,
+				38EAF1B92DE3F8AC00D4EA9E /* EateryLogTests */,
+				38EAF1C32DE3F8AC00D4EA9E /* EateryLogUITests */,
 			);
 		};
 /* End PBXProject section */
@@ -285,12 +283,12 @@
 /* Begin PBXTargetDependency section */
 		38EAF1BC2DE3F8AC00D4EA9E /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
-			target = 38EAF1AC2DE3F8AA00D4EA9E /* FoodTracker2 */;
+			target = 38EAF1AC2DE3F8AA00D4EA9E /* EateryLog */;
 			targetProxy = 38EAF1BB2DE3F8AC00D4EA9E /* PBXContainerItemProxy */;
 		};
 		38EAF1C62DE3F8AC00D4EA9E /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
-			target = 38EAF1AC2DE3F8AA00D4EA9E /* FoodTracker2 */;
+			target = 38EAF1AC2DE3F8AA00D4EA9E /* EateryLog */;
 			targetProxy = 38EAF1C52DE3F8AC00D4EA9E /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
@@ -425,7 +423,7 @@
 				DEVELOPMENT_TEAM = YM7H663BDL;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_FILE = foodtracker2/Info.plist;
+				INFOPLIST_FILE = EateryLog/Info.plist;
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -454,7 +452,7 @@
 				DEVELOPMENT_TEAM = YM7H663BDL;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_FILE = foodtracker2/Info.plist;
+				INFOPLIST_FILE = EateryLog/Info.plist;
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -487,7 +485,7 @@
 				SWIFT_EMIT_LOC_STRINGS = NO;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
-				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/FoodTracker2.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/FoodTracker2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/EateryLog.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/EateryLog";
 			};
 			name = Debug;
 		};
@@ -505,7 +503,7 @@
 				SWIFT_EMIT_LOC_STRINGS = NO;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
-				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/FoodTracker2.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/FoodTracker2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/EateryLog.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/EateryLog";
 			};
 			name = Release;
 		};
@@ -544,7 +542,7 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		38EAF1A82DE3F8AA00D4EA9E /* Build configuration list for PBXProject "FoodTracker2" */ = {
+		38EAF1A82DE3F8AA00D4EA9E /* Build configuration list for PBXProject "EateryLog" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				38EAF1CC2DE3F8AC00D4EA9E /* Debug */,
@@ -553,7 +551,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		38EAF1CE2DE3F8AC00D4EA9E /* Build configuration list for PBXNativeTarget "FoodTracker2" */ = {
+		38EAF1CE2DE3F8AC00D4EA9E /* Build configuration list for PBXNativeTarget "EateryLog" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				38EAF1CF2DE3F8AC00D4EA9E /* Debug */,
@@ -562,7 +560,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		38EAF1D12DE3F8AC00D4EA9E /* Build configuration list for PBXNativeTarget "FoodTracker2Tests" */ = {
+		38EAF1D12DE3F8AC00D4EA9E /* Build configuration list for PBXNativeTarget "EateryLogTests" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				38EAF1D22DE3F8AC00D4EA9E /* Debug */,
@@ -571,7 +569,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		38EAF1D42DE3F8AC00D4EA9E /* Build configuration list for PBXNativeTarget "FoodTracker2UITests" */ = {
+		38EAF1D42DE3F8AC00D4EA9E /* Build configuration list for PBXNativeTarget "EateryLogUITests" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				38EAF1D52DE3F8AC00D4EA9E /* Debug */,

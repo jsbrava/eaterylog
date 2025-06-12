@@ -6,9 +6,9 @@
 //
 
 import Testing
-@testable import FoodTracker2
+@testable import EateryLog
 
-struct FoodTracker2Tests {
+struct EaterLogTests {
 
     @Test func example() async throws {
         // Write your test here and use APIs like `#expect(...)` to check expected conditions.
