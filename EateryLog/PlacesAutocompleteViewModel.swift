@@ -138,7 +138,11 @@ class PlacesAutocompleteViewModel: ObservableObject {
             }
         }.resume()
     }
-    func searchRestaurants(query: String, completion: @escaping ([PlaceSuggestion]) -> Void) {
+    func searchRestaurants(
+        query: String,
+        userLocation: CLLocation,
+        completion: @escaping ([PlaceSuggestion]) -> Void
+    ) {
         let queryEncoded = query.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) ?? ""
         let urlString = "https://maps.googleapis.com/maps/api/place/autocomplete/json?input=\(queryEncoded)&types=establishment&key=\(apiKey)"
         guard let url = URL(string: urlString) else {
@@ -163,7 +167,12 @@ class PlacesAutocompleteViewModel: ObservableObject {
                               let placeID = place["place_id"] as? String else { return nil }
                         return PlaceSuggestion(description: description, placeID: placeID)
                     }
-                    completion(suggestions)
+                    self.filterAndSortRestaurantSuggestions(
+                        suggestions: suggestions,
+                        userLocation: userLocation
+                    ) { sortedRestaurants in
+                        completion(sortedRestaurants)
+                    }
                 } else {
                     completion([])
                 }
@@ -171,6 +180,85 @@ class PlacesAutocompleteViewModel: ObservableObject {
                 print("JSON parse error: \(error)")
                 completion([])
             }
+        }.resume()
+    }
+    func filterAndSortRestaurantSuggestions(
+        suggestions: [PlaceSuggestion],
+        userLocation: CLLocation,
+        completion: @escaping ([PlaceSuggestion]) -> Void
+    ) {
+        let group = DispatchGroup()
+        var filtered: [PlaceSuggestion] = []
+
+        for suggestion in suggestions {
+            group.enter()
+            fetchPlaceDetailsForTypeAndLocation(placeID: suggestion.placeID) { types, lat, lng in
+                if types.contains("restaurant"), let lat = lat, let lng = lng {
+                    var s = suggestion
+                    s.latitude = lat
+                    s.longitude = lng
+                    filtered.append(s)
+                }
+                group.leave()
+            }
+        }
+
+        group.notify(queue: .main) {
+            let sorted = filtered.sorted {
+                guard let lat1 = $0.latitude, let lng1 = $0.longitude,
+                      let lat2 = $1.latitude, let lng2 = $1.longitude else { return false }
+                let loc1 = CLLocation(latitude: lat1, longitude: lng1)
+                let loc2 = CLLocation(latitude: lat2, longitude: lng2)
+                return userLocation.distance(from: loc1) < userLocation.distance(from: loc2)
+            }
+            completion(sorted)
+        }
+    }
+
+    private func fetchPlaceDetailsForType(placeID: String, completion: @escaping ([String]) -> Void) {
+        let apiKey = AppConfig.googlePlacesAPIKey
+        let urlString = "https://maps.googleapis.com/maps/api/place/details/json?placeid=\(placeID)&fields=types&key=\(apiKey)"
+        guard let url = URL(string: urlString) else {
+            completion([])
+            return
+        }
+        URLSession.shared.dataTask(with: url) { data, _, _ in
+            guard let data = data,
+                  let json = try? JSONSerialization.jsonObject(with: data) as? [String: Any],
+                  let result = json["result"] as? [String: Any],
+                  let types = result["types"] as? [String] else {
+                completion([])
+                return
+            }
+            completion(types)
+        }.resume()
+    }
+    private func fetchPlaceDetailsForTypeAndLocation(
+        placeID: String,
+        completion: @escaping (_ types: [String], _ lat: Double?, _ lng: Double?) -> Void
+    ) {
+        let apiKey = AppConfig.googlePlacesAPIKey
+        let urlString = "https://maps.googleapis.com/maps/api/place/details/json?placeid=\(placeID)&fields=types,geometry&key=\(apiKey)"
+        guard let url = URL(string: urlString) else {
+            completion([], nil, nil)
+            return
+        }
+        URLSession.shared.dataTask(with: url) { data, _, _ in
+            guard let data = data,
+                  let json = try? JSONSerialization.jsonObject(with: data) as? [String: Any],
+                  let result = json["result"] as? [String: Any],
+                  let types = result["types"] as? [String] else {
+                completion([], nil, nil)
+                return
+            }
+            var lat: Double? = nil
+            var lng: Double? = nil
+            if let geometry = result["geometry"] as? [String: Any],
+               let location = geometry["location"] as? [String: Any] {
+                lat = location["lat"] as? Double
+                lng = location["lng"] as? Double
+            }
+            completion(types, lat, lng)
         }.resume()
     }
 }

@@ -51,6 +51,8 @@ struct PlaceSuggestion: Identifiable {
     let id = UUID()
     let description: String
     let placeID: String
+    var latitude: Double?    // <-- Add
+    var longitude: Double?
 }
 extension Restaurant {
     func distance(from userLocation: CLLocation?) -> CLLocationDistance? {

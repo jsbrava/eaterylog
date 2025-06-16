@@ -33,23 +33,26 @@ struct RestaurantDetailView: View {
 
             Text("Previous Visits")
                 .font(.headline)
-            List(restaurant.visits.suffix(5)) { visit in
-                VStack(alignment: .leading) {
-                    Text("Visit on \(visit.date.formatted(.dateTime.month().day().year()))")
-                        .font(.subheadline)
-                    ForEach(visit.dishes) { dish in
-                        HStack {
-                            Text(dish.name)
-                                .bold()
-                            Text("- \(dish.orderedBy)")
-                                .italic()
-                            Spacer()
-                            Text("⭐️ \(dish.rating)")
+            
+            List {
+                // Only show the last 5 visits, most recent first
+                ForEach(Array(restaurant.visits.suffix(5).enumerated()), id: \.element.id) { index, visit in
+                    VStack(alignment: .leading) {
+                        Text("Visit on \(visit.date.formatted(.dateTime.month().day().year()))")
+                            .font(.subheadline)
+                        ForEach(visit.dishes) { dish in
+                            HStack {
+                                Text(dish.name).bold()
+                                Text("- \(dish.orderedBy)").italic()
+                                Spacer()
+                                Text("⭐️ \(dish.rating)")
+                            }
+                            Text(dish.notes)
+                                .font(.caption)
                         }
-                        Text(dish.notes)
-                            .font(.caption)
                     }
                 }
+                .onDelete(perform: deleteVisit)
             }
             .frame(height: 200)
 
@@ -102,5 +105,17 @@ struct RestaurantDetailView: View {
             Spacer()
         }
         .padding()
+    }
+    
+    // MARK: - Delete Visit Handler
+    private func deleteVisit(at offsets: IndexSet) {
+        // Get the last 5 visits
+        let lastFive = restaurant.visits.suffix(5)
+        // Compute the real indices in the visits array
+        let indicesToDelete = offsets.map { restaurant.visits.count - lastFive.count + $0 }
+        for idx in indicesToDelete.sorted(by: >) { // Delete from highest index
+            restaurantStore.deleteVisit(from: restaurant, at: idx)
+        }
+        restaurant = restaurantStore.restaurants.first(where: { $0.id == restaurant.id }) ?? restaurant
     }
 }

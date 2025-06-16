@@ -101,6 +101,14 @@ class RestaurantStore: ObservableObject {
             print("Failed to save restaurants: \(error)")
         }
     }
+    func deleteVisit(from restaurant: Restaurant, at visitIndex: Int) {
+        // Find the index of the restaurant in the array
+        if let restIndex = restaurants.firstIndex(where: { $0.id == restaurant.id }) {
+            guard visitIndex < restaurants[restIndex].visits.count else { return }
+            restaurants[restIndex].visits.remove(at: visitIndex)
+            save() // Persist the change
+        }
+    }
     
 }
 extension RestaurantStore {

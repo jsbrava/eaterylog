@@ -103,11 +103,19 @@ struct NearbyRestaurantsView: View {
             return
         }
         isSearching = true
-        viewModel.searchRestaurants(query: searchQuery) { results in
-            DispatchQueue.main.async {
-                self.searchResults = results
-                self.isSearching = false
+
+        // Use the user's current location if available
+        if let userLocation = locationManager.location {
+            viewModel.searchRestaurants(query: searchQuery, userLocation: userLocation) { results in
+                DispatchQueue.main.async {
+                    self.searchResults = results
+                    self.isSearching = false
+                }
             }
+        } else {
+            // Optionally, handle case when location is not available
+            self.isSearching = false
+            // Maybe show an alert or default to something else
         }
     }
     
