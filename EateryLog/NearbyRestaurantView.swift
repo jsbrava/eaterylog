@@ -11,6 +11,7 @@ import CoreLocation
 
 struct NearbyRestaurantsView: View {
     @ObservedObject var viewModel: PlacesAutocompleteViewModel
+    @ObservedObject var restaurantStore: RestaurantStore      // <-- Add this line!
     @ObservedObject var locationManager = LocationManager()
     @State private var hasFetched = false
     @State private var lastFetchedLocation: CLLocation?
@@ -30,10 +31,15 @@ struct NearbyRestaurantsView: View {
 
             if let _ = locationManager.location {
                 List(viewModel.suggestions, id: \.placeID) { suggestion in
+                    // Check if this restaurant has visits in your data store
+                    let isVisited = restaurantStore.restaurants.contains {
+                        $0.placeID == suggestion.placeID && !$0.visits.isEmpty
+                    }
                     Button(action: {
                         onSelect(suggestion)
                     }) {
                         Text(suggestion.description)
+                            .fontWeight(isVisited ? .bold : .regular)
                     }
                 }
                 .frame(height: CGFloat(viewModel.suggestions.count * 44 + 10)) // Approximate height for 5 rows
@@ -68,10 +74,14 @@ struct NearbyRestaurantsView: View {
 
             if !searchResults.isEmpty {
                 List(searchResults, id: \.placeID) { suggestion in
+                    let isVisited = restaurantStore.restaurants.contains {
+                        $0.placeID == suggestion.placeID && !$0.visits.isEmpty
+                    }
                     Button(action: {
                         onSelect(suggestion)
                     }) {
                         Text(suggestion.description)
+                            .fontWeight(isVisited ? .bold : .regular)
                     }
                 }
                 .frame(height: CGFloat(searchResults.count * 44 + 10)) // adjust if needed
@@ -96,7 +106,6 @@ struct NearbyRestaurantsView: View {
         }
     }
 
-    
     private func searchRestaurants() {
         guard !searchQuery.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else {
             searchResults = []
@@ -104,7 +113,6 @@ struct NearbyRestaurantsView: View {
         }
         isSearching = true
 
-        // Use the user's current location if available
         if let userLocation = locationManager.location {
             viewModel.searchRestaurants(query: searchQuery, userLocation: userLocation) { results in
                 DispatchQueue.main.async {
@@ -113,10 +121,7 @@ struct NearbyRestaurantsView: View {
                 }
             }
         } else {
-            // Optionally, handle case when location is not available
             self.isSearching = false
-            // Maybe show an alert or default to something else
         }
     }
-    
 }

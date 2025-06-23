@@ -16,14 +16,15 @@ struct ContentView: View {
     var body: some View {
         NavigationStack {
             VStack(spacing: 12) {
-                NearbyRestaurantsView(viewModel: viewModel) { suggestion in
+                // Pass restaurantStore as a parameter
+                NearbyRestaurantsView(viewModel: viewModel, restaurantStore: restaurantStore) { suggestion in
                     restaurantStore.addRestaurantIfNeeded(from: suggestion) { restaurant in
                         selectedRestaurant = restaurant
                     }
                 }
             }
-            .navigationDestination(item: $selectedRestaurant) { restaurant in  // <-- And this block
-                            RestaurantDetailView(restaurantStore: restaurantStore, restaurant: restaurant)
+            .navigationDestination(item: $selectedRestaurant) { restaurant in
+                RestaurantDetailView(restaurantStore: restaurantStore, restaurant: restaurant)
             }
         }
     }
