@@ -99,8 +99,11 @@ class PlacesAutocompleteViewModel: ObservableObject {
                               let placeID = place["place_id"] as? String else { return nil }
                         return PlaceSuggestion(description: name, placeID: placeID)
                     }
-                    DispatchQueue.main.async {
-                        self.suggestions = suggestions
+
+                    self.enrichSuggestionsWithCoordinates(suggestions) { enrichedSuggestions in
+                        DispatchQueue.main.async {
+                            self.suggestions = enrichedSuggestions
+                        }
                     }
                 }
             } catch {
@@ -233,6 +236,30 @@ class PlacesAutocompleteViewModel: ObservableObject {
             completion(types)
         }.resume()
     }
+    
+    func enrichSuggestionsWithCoordinates(
+        _ suggestions: [PlaceSuggestion],
+        completion: @escaping ([PlaceSuggestion]) -> Void
+    ) {
+        var enriched: [PlaceSuggestion] = []
+        let group = DispatchGroup()
+
+        for suggestion in suggestions {
+            group.enter()
+            fetchPlaceDetails(placeID: suggestion.placeID) { _, lat, lng in
+                var copy = suggestion
+                copy.latitude = lat
+                copy.longitude = lng
+                enriched.append(copy)
+                group.leave()
+            }
+        }
+
+        group.notify(queue: .main) {
+            completion(enriched)
+        }
+    }
+    
     private func fetchPlaceDetailsForTypeAndLocation(
         placeID: String,
         completion: @escaping (_ types: [String], _ lat: Double?, _ lng: Double?) -> Void

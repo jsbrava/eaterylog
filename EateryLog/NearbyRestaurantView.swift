@@ -11,7 +11,7 @@ import CoreLocation
 
 struct NearbyRestaurantsView: View {
     @ObservedObject var viewModel: PlacesAutocompleteViewModel
-    @ObservedObject var restaurantStore: RestaurantStore      // <-- Add this line!
+    @ObservedObject var restaurantStore: RestaurantStore
     @ObservedObject var locationManager = LocationManager()
     @State private var hasFetched = false
     @State private var lastFetchedLocation: CLLocation?
@@ -29,20 +29,30 @@ struct NearbyRestaurantsView: View {
                 .font(.title2)
                 .fontWeight(.semibold)
 
-            if let _ = locationManager.location {
+            if let userLocation = locationManager.location {
                 List(viewModel.suggestions, id: \.placeID) { suggestion in
-                    // Check if this restaurant has visits in your data store
                     let isVisited = restaurantStore.restaurants.contains {
                         $0.placeID == suggestion.placeID && !$0.visits.isEmpty
                     }
+                    let distanceString: String = {
+                        if let lat = suggestion.latitude, let lng = suggestion.longitude {
+                            let restaurantLoc = CLLocation(latitude: lat, longitude: lng)
+                            let meters = userLocation.distance(from: restaurantLoc)
+                            let miles = meters / 1609.34
+                            return String(format: " – %.1f mi", miles)
+                        } else {
+                            return ""
+                        }
+                    }()
+
                     Button(action: {
                         onSelect(suggestion)
                     }) {
-                        Text(suggestion.description)
+                        Text(suggestion.description + distanceString)
                             .fontWeight(isVisited ? .bold : .regular)
                     }
                 }
-                .frame(height: CGFloat(viewModel.suggestions.count * 44 + 10)) // Approximate height for 5 rows
+                .frame(height: CGFloat(viewModel.suggestions.count * 44 + 10))
             } else {
                 ProgressView("Getting your location...")
             }
@@ -69,22 +79,33 @@ struct NearbyRestaurantsView: View {
                 }
                 Spacer()
             }
-            .frame(maxWidth: .infinity) // Ensures HStack takes full width
+            .frame(maxWidth: .infinity)
             .padding(.bottom, 2)
 
-            if !searchResults.isEmpty {
+            if !searchResults.isEmpty, let userLocation = locationManager.location {
                 List(searchResults, id: \.placeID) { suggestion in
                     let isVisited = restaurantStore.restaurants.contains {
                         $0.placeID == suggestion.placeID && !$0.visits.isEmpty
                     }
+                    let distanceString: String = {
+                        if let lat = suggestion.latitude, let lng = suggestion.longitude {
+                            let restaurantLoc = CLLocation(latitude: lat, longitude: lng)
+                            let meters = userLocation.distance(from: restaurantLoc)
+                            let miles = meters / 1609.34
+                            return String(format: " – %.1f mi", miles)
+                        } else {
+                            return ""
+                        }
+                    }()
+
                     Button(action: {
                         onSelect(suggestion)
                     }) {
-                        Text(suggestion.description)
+                        Text(suggestion.description + distanceString)
                             .fontWeight(isVisited ? .bold : .regular)
                     }
                 }
-                .frame(height: CGFloat(searchResults.count * 44 + 10)) // adjust if needed
+                .frame(height: CGFloat(searchResults.count * 44 + 10))
             }
             
         }
