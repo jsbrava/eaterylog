@@ -24,7 +24,6 @@ struct NearbyRestaurantsView: View {
 
     var body: some View {
         VStack(alignment: .center, spacing: 16) {
-            
             Text("Nearby Restaurants")
                 .font(.title2)
                 .fontWeight(.semibold)
@@ -52,17 +51,18 @@ struct NearbyRestaurantsView: View {
                             .fontWeight(isVisited ? .bold : .regular)
                     }
                 }
-                .frame(height: CGFloat(viewModel.suggestions.count * 44 + 10))
+                .frame(maxHeight: 250) // Nearby section limited height
             } else {
                 ProgressView("Getting your location...")
             }
-            
+
             Divider()
                 .padding(.vertical, 8)
-                
+            
             Text("Can't find it? Search:")
                 .font(.title2)
                 .fontWeight(.semibold)
+            
             HStack {
                 TextField("Enter restaurant name...", text: $searchQuery, onCommit: {
                     searchRestaurants()
@@ -81,7 +81,8 @@ struct NearbyRestaurantsView: View {
             }
             .frame(maxWidth: .infinity)
             .padding(.bottom, 2)
-
+            
+            // *** THE SEARCH RESULTS FILL THE REST OF THE SCREEN ***
             if !searchResults.isEmpty, let userLocation = locationManager.location {
                 List(searchResults, id: \.placeID) { suggestion in
                     let isVisited = restaurantStore.restaurants.contains {
@@ -105,11 +106,14 @@ struct NearbyRestaurantsView: View {
                             .fontWeight(isVisited ? .bold : .regular)
                     }
                 }
-                .frame(height: CGFloat(searchResults.count * 44 + 10))
+                .listStyle(PlainListStyle())
+                // *** THIS LINE LETS IT FILL REMAINING VERTICAL SPACE ***
+                .frame(maxHeight: .infinity)
             }
-            
+            Spacer()
         }
-        .offset(y: -40)
+        .frame(maxHeight: .infinity, alignment: .top)
+        .padding(.top, 8)
         .onAppear {
             if !hasFetched {
                 hasFetched = true
