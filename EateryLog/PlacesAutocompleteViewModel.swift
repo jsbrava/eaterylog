@@ -96,14 +96,28 @@ class PlacesAutocompleteViewModel: ObservableObject {
                    let results = json["results"] as? [[String: Any]] {
                     let suggestions: [PlaceSuggestion] = results.prefix(8).compactMap { place in
                         guard let name = place["name"] as? String,
-                              let placeID = place["place_id"] as? String else { return nil }
-                        return PlaceSuggestion(description: name, placeID: placeID)
+                              let placeID = place["place_id"] as? String,
+                              let geometry = place["geometry"] as? [String: Any],
+                              let locationDict = geometry["location"] as? [String: Any],
+                              let lat = locationDict["lat"] as? Double,
+                              let lng = locationDict["lng"] as? Double
+                        else { return nil }
+                        var suggestion = PlaceSuggestion(description: name, placeID: placeID)
+                        suggestion.latitude = lat
+                        suggestion.longitude = lng
+                        return suggestion
                     }
 
-                    self.enrichSuggestionsWithCoordinates(suggestions) { enrichedSuggestions in
-                        DispatchQueue.main.async {
-                            self.suggestions = enrichedSuggestions
-                        }
+                    // Sort by distance from user's location
+                    let sortedSuggestions = suggestions.sorted { a, b in
+                        guard let alat = a.latitude, let alng = a.longitude,
+                              let blat = b.latitude, let blng = b.longitude else { return false }
+                        let aloc = CLLocation(latitude: alat, longitude: alng)
+                        let bloc = CLLocation(latitude: blat, longitude: blng)
+                        return location.distance(from: aloc) < location.distance(from: bloc)
+                    }
+                    DispatchQueue.main.async {
+                        self.suggestions = sortedSuggestions
                     }
                 }
             } catch {
