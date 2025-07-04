@@ -49,9 +49,16 @@ struct NearbyRestaurantsView: View {
                     }) {
                         Text(suggestion.description + distanceString)
                             .fontWeight(isVisited ? .bold : .regular)
+                            .foregroundColor(.blue)
                     }
                 }
-                .frame(maxHeight: 250) // Nearby section limited height
+                .listStyle(PlainListStyle())
+                .frame(maxHeight: 250)
+                .background(
+                    RoundedRectangle(cornerRadius: 18)
+                        .fill(Color(.systemGray6))
+                )
+                .padding(.horizontal, 16)
             } else {
                 ProgressView("Getting your location...")
             }
@@ -82,7 +89,6 @@ struct NearbyRestaurantsView: View {
             .frame(maxWidth: .infinity)
             .padding(.bottom, 2)
             
-            // *** THE SEARCH RESULTS FILL THE REST OF THE SCREEN ***
             if !searchResults.isEmpty, let userLocation = locationManager.location {
                 List(searchResults, id: \.placeID) { suggestion in
                     let isVisited = restaurantStore.restaurants.contains {
@@ -104,11 +110,16 @@ struct NearbyRestaurantsView: View {
                     }) {
                         Text(suggestion.description + distanceString)
                             .fontWeight(isVisited ? .bold : .regular)
+                            .foregroundColor(.blue)
                     }
                 }
                 .listStyle(PlainListStyle())
-                // *** THIS LINE LETS IT FILL REMAINING VERTICAL SPACE ***
-                .frame(maxHeight: .infinity)
+                .background(
+                    RoundedRectangle(cornerRadius: 18)
+                        .fill(Color(.systemGray6))
+                )
+                .padding(.horizontal, 16)
+                // Remove .frame(maxHeight:) so it uses the remaining space, or adjust as needed
             }
             Spacer()
         }
