@@ -149,3 +149,12 @@ extension RestaurantStore {
         }.resume()
     }
 }
+extension RestaurantStore {
+    /// Update an existing restaurant by replacing the one with the same id.
+    func updateRestaurant(_ updated: Restaurant) {
+        if let idx = restaurants.firstIndex(where: { $0.id == updated.id }) {
+            restaurants[idx] = updated
+            save()
+        }
+    }
+}

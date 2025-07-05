@@ -20,6 +20,11 @@ struct RestaurantDetailView: View {
 
     // List of new dishes for this visit
     @State private var newDishes: [Dish] = []
+    
+    // For editing
+    //@State private var isEditingDish = false
+    //@State private var dishToEdit: (visitIndex: Int, dish: Dish)? = nil
+    @State private var dishToEdit: EditableDishContext?
 
     var body: some View {
         VStack(alignment: .leading) {
@@ -36,25 +41,53 @@ struct RestaurantDetailView: View {
             
             List {
                 // Only show the last 5 visits, most recent first
-                ForEach(Array(restaurant.visits.suffix(5).enumerated()), id: \.element.id) { index, visit in
-                    VStack(alignment: .leading) {
-                        Text("Visit on \(visit.date.formatted(.dateTime.month().day().year()))")
-                            .font(.subheadline)
-                        ForEach(visit.dishes) { dish in
-                            HStack {
-                                Text(dish.name).bold()
-                                Text("- \(dish.orderedBy)").italic()
-                                Spacer()
-                                Text("⭐️ \(dish.rating)")
+                ForEach(Array(restaurant.visits.suffix(5).enumerated()), id: \.element.id) { visitIndex, visit in
+                    Section(header: Text("Visit on \(visit.date.formatted(.dateTime.month().day().year()))").font(.subheadline)) {
+                        ForEach(Array(visit.dishes.enumerated()), id: \.element.id) { dishIndex, dish in
+                            VStack(alignment: .leading) {
+                                HStack {
+                                    Text(dish.name).bold()
+                                    Text("- \(dish.orderedBy)").italic()
+                                    Spacer()
+                                    Text("⭐️ \(dish.rating)")
+                                }
+                                if !dish.notes.isEmpty {
+                                    Text(dish.notes)
+                                        .font(.caption)
+                                }
                             }
-                            Text(dish.notes)
-                                .font(.caption)
+                            .swipeActions(edge: .trailing) {
+                                Button(role: .destructive) {
+                                    deleteDish(visitIndex: realVisitIndex(visitIndex), dishIndex: dishIndex)
+                                } label: {
+                                    Label("Delete", systemImage: "trash")
+                                }
+                                Button {
+                                    dishToEdit = EditableDishContext(
+                                        visitIndex: realVisitIndex(visitIndex),
+                                        dish: dish
+                                    )
+                                } label: {
+                                    Label("Edit", systemImage: "pencil")
+                                }
+                            }
                         }
                     }
                 }
-                .onDelete(perform: deleteVisit)
             }
             .frame(height: 200)
+            .sheet(item: $dishToEdit) { editableContext in
+                EditDishView(
+                    dish: editableContext.dish,
+                    onSave: { updatedDish in
+                        editDish(visitIndex: editableContext.visitIndex, updatedDish: updatedDish)
+                        dishToEdit = nil
+                    },
+                    onCancel: {
+                        dishToEdit = nil
+                    }
+                )
+            }
 
             Divider()
                 .padding(.vertical)
@@ -107,15 +140,44 @@ struct RestaurantDetailView: View {
         .padding()
     }
     
-    // MARK: - Delete Visit Handler
-    private func deleteVisit(at offsets: IndexSet) {
-        // Get the last 5 visits
-        let lastFive = restaurant.visits.suffix(5)
-        // Compute the real indices in the visits array
-        let indicesToDelete = offsets.map { restaurant.visits.count - lastFive.count + $0 }
-        for idx in indicesToDelete.sorted(by: >) { // Delete from highest index
-            restaurantStore.deleteVisit(from: restaurant, at: idx)
-        }
-        restaurant = restaurantStore.restaurants.first(where: { $0.id == restaurant.id }) ?? restaurant
+    // Convert visible visit index to real index in data
+    private func realVisitIndex(_ visibleIndex: Int) -> Int {
+        let allVisits = restaurant.visits
+        let lastFive = allVisits.suffix(5)
+        return allVisits.count - lastFive.count + visibleIndex
     }
+    
+    // MARK: - Delete Dish Handler
+    private func deleteDish(visitIndex: Int, dishIndex: Int) {
+        var updatedRestaurant = restaurant
+        guard visitIndex < updatedRestaurant.visits.count else { return }
+        var visit = updatedRestaurant.visits[visitIndex]
+        visit.dishes.remove(at: dishIndex)
+        if visit.dishes.isEmpty {
+            // Remove the whole visit
+            updatedRestaurant.visits.remove(at: visitIndex)
+        } else {
+            updatedRestaurant.visits[visitIndex] = visit
+        }
+        restaurantStore.updateRestaurant(updatedRestaurant)
+        restaurant = updatedRestaurant
+    }
+
+    // MARK: - Edit Dish Handler
+    private func editDish(visitIndex: Int, updatedDish: Dish) {
+        var updatedRestaurant = restaurant
+        guard visitIndex < updatedRestaurant.visits.count else { return }
+        var visit = updatedRestaurant.visits[visitIndex]
+        if let dishIndex = visit.dishes.firstIndex(where: { $0.id == updatedDish.id }) {
+            visit.dishes[dishIndex] = updatedDish
+            updatedRestaurant.visits[visitIndex] = visit
+            restaurantStore.updateRestaurant(updatedRestaurant)
+            restaurant = updatedRestaurant
+        }
+    }
+}
+struct EditableDishContext: Identifiable {
+    var id: UUID { dish.id }
+    let visitIndex: Int
+    var dish: Dish
 }

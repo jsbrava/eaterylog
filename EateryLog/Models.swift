@@ -32,11 +32,11 @@ struct Visit: Identifiable, Codable, Equatable, Hashable {
 }
 
 struct Dish: Identifiable, Codable, Equatable, Hashable {
-    let id: UUID
-    let name: String
-    let orderedBy: String
-    let notes: String
-    let rating: Int
+    var id: UUID
+    var name: String
+    var orderedBy: String
+    var notes: String
+    var rating: Int
 
     // Explicit initializer with default UUID
     init(id: UUID = UUID(), name: String, orderedBy: String, notes: String, rating: Int) {
