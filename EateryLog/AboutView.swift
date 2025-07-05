@@ -1,3 +1,11 @@
+//
+//  AboutView.swift
+//  EateryLog
+//
+//  Created by jim on 7/5/25.
+//
+
+
 import SwiftUI
 
 struct AboutView: View {

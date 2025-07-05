@@ -1,3 +1,11 @@
+//
+//  RestaurantSortOption.swift
+//  EateryLog
+//
+//  Created by jim on 7/5/25.
+//
+
+
 import SwiftUI
 import CoreLocation
 
@@ -36,25 +44,39 @@ struct MyRestaurantsView: View {
             .pickerStyle(.segmented)
             .padding(.horizontal)
 
-            List(sortedRestaurants) { restaurant in
-                Button {
-                    selectedRestaurant = restaurant
-                } label: {
-                    HStack {
-                        Text(restaurant.name)
-                        Spacer()
-                        if sortOption == .distance, let userLocation = locationManager.location {
-                            Text(restaurant.formattedDistance(from: userLocation))
-                                .foregroundColor(.secondary)
+            List {
+                ForEach(sortedRestaurants) { restaurant in
+                    Button {
+                        selectedRestaurant = restaurant
+                    } label: {
+                        HStack {
+                            Text(restaurant.name)
+                                .fontWeight(restaurant.visits.isEmpty ? .regular : .bold)
+                                .foregroundColor(.blue)
+                            Spacer()
+                            if sortOption == .distance, let userLocation = locationManager.location {
+                                Text(restaurant.formattedDistance(from: userLocation))
+                                    .foregroundColor(.secondary)
+                            }
                         }
                     }
                 }
+                .onDelete(perform: deleteRestaurant)
             }
             .listStyle(.inset)
         }
         .navigationTitle("My Restaurants")
         .navigationDestination(item: $selectedRestaurant) { restaurant in
             RestaurantDetailView(restaurantStore: restaurantStore, restaurant: restaurant)
+        }
+    }
+    private func deleteRestaurant(at offsets: IndexSet) {
+        for index in offsets {
+            let restaurant = sortedRestaurants[index]
+            if let actualIndex = restaurantStore.restaurants.firstIndex(where: { $0.id == restaurant.id }) {
+                restaurantStore.restaurants.remove(at: actualIndex)
+                restaurantStore.save() // persist change if you have a save() method
+            }
         }
     }
 }
@@ -79,3 +101,4 @@ extension Restaurant {
         }
     }
 }
+
