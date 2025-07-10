@@ -75,6 +75,21 @@ class RestaurantStore: ObservableObject {
             }
         }
     }
+    func buildRestaurant(from suggestion: PlaceSuggestion, completion: @escaping (Restaurant) -> Void) {
+        fetchPlaceDetails(placeID: suggestion.placeID) { address, lat, lng in
+            let restaurant = Restaurant(
+                name: suggestion.description,
+                address: address,
+                latitude: lat,
+                longitude: lng,
+                placeID: suggestion.placeID,
+                visits: []
+            )
+            DispatchQueue.main.async {
+                completion(restaurant)
+            }
+        }
+    }
     func addVisit(to restaurant: Restaurant, visit: Visit) {
         // Find the index of the restaurant in the array
         if let index = restaurants.firstIndex(where: { $0.id == restaurant.id }) {
@@ -84,10 +99,15 @@ class RestaurantStore: ObservableObject {
     }
     // Load restaurants from disk
     func load() {
+        print("load() called")
         do {
             let data = try Data(contentsOf: savePath)
             let decoded = try JSONDecoder().decode([Restaurant].self, from: data)
             self.restaurants = decoded
+            print("Loaded \(restaurants.count) restaurants")
+            for r in restaurants {
+                print("  \(r.name): \(r.visits.count) visits")
+            }
         } catch {
             print("Failed to load restaurants: \(error)")
         }
@@ -156,5 +176,17 @@ extension RestaurantStore {
             restaurants[idx] = updated
             save()
         }
+    }
+}
+extension RestaurantStore {
+    /// Add a new restaurant if it doesn't exist, or update it if it does.
+    func addOrUpdateRestaurant(_ restaurant: Restaurant) {
+        if let idx = restaurants.firstIndex(where: { $0.id == restaurant.id }) {
+            restaurants[idx] = restaurant
+        } else {
+            print("Adding new restaurant \(restaurant.name) with \(restaurant.visits.count) visits")
+            restaurants.append(restaurant)
+        }
+        save()
     }
 }

@@ -18,8 +18,8 @@ enum RestaurantSortOption: String, CaseIterable, Identifiable {
 struct MyRestaurantsView: View {
     @ObservedObject var restaurantStore: RestaurantStore
     @ObservedObject var locationManager = LocationManager.shared
+    var onSelect: (Restaurant) -> Void       // <-- NEW: closure for item taps
     @State private var sortOption: RestaurantSortOption = .distance
-    @State private var selectedRestaurant: Restaurant? = nil
 
     var sortedRestaurants: [Restaurant] {
         let restaurants = restaurantStore.restaurants
@@ -47,7 +47,7 @@ struct MyRestaurantsView: View {
             List {
                 ForEach(sortedRestaurants) { restaurant in
                     Button {
-                        selectedRestaurant = restaurant
+                        onSelect(restaurant)   // <-- Call the closure
                     } label: {
                         HStack {
                             Text(restaurant.name)
@@ -66,16 +66,15 @@ struct MyRestaurantsView: View {
             .listStyle(.inset)
         }
         .navigationTitle("My Restaurants")
-        .navigationDestination(item: $selectedRestaurant) { restaurant in
-            RestaurantDetailView(restaurantStore: restaurantStore, restaurant: restaurant)
-        }
+        // <-- Remove .navigationDestination here!
     }
+
     private func deleteRestaurant(at offsets: IndexSet) {
         for index in offsets {
             let restaurant = sortedRestaurants[index]
             if let actualIndex = restaurantStore.restaurants.firstIndex(where: { $0.id == restaurant.id }) {
                 restaurantStore.restaurants.remove(at: actualIndex)
-                restaurantStore.save() // persist change if you have a save() method
+                restaurantStore.save()
             }
         }
     }
@@ -101,4 +100,3 @@ extension Restaurant {
         }
     }
 }
-

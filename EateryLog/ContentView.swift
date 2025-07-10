@@ -9,10 +9,9 @@
 import SwiftUI
 
 struct ContentView: View {
-    @State private var selectedRestaurant: Restaurant? = nil
     @StateObject var restaurantStore = RestaurantStore()
     @StateObject var viewModel = PlacesAutocompleteViewModel()
-    // If you want to handle selection for MyRestaurantsView as well, you can add a second selectedRestaurant state.
+    @State private var pendingRestaurant: Restaurant? = nil
 
     var body: some View {
         TabView {
@@ -22,12 +21,22 @@ struct ContentView: View {
                     viewModel: viewModel,
                     restaurantStore: restaurantStore
                 ) { suggestion in
-                    restaurantStore.addRestaurantIfNeeded(from: suggestion) { restaurant in
-                        selectedRestaurant = restaurant
+                    restaurantStore.buildRestaurant(from: suggestion) { restaurant in
+                        pendingRestaurant = restaurant
                     }
                 }
-                .navigationDestination(item: $selectedRestaurant) { restaurant in
-                    RestaurantDetailView(restaurantStore: restaurantStore, restaurant: restaurant)
+                .navigationDestination(item: $pendingRestaurant) { restaurant in
+                    RestaurantDetailView(
+                        restaurantStore: restaurantStore,
+                        restaurantID: restaurant.id,
+                        onAddVisit: { visit in
+                            saveVisit(for: restaurant.id, visit: visit)
+                            pendingRestaurant = nil
+                        },
+                        onCancel: {
+                            pendingRestaurant = nil
+                        }
+                    )
                 }
             }
             .tabItem {
@@ -37,7 +46,22 @@ struct ContentView: View {
 
             // My Restaurants tab
             NavigationStack {
-                MyRestaurantsView(restaurantStore: restaurantStore)
+                MyRestaurantsView(restaurantStore: restaurantStore) { restaurant in
+                    pendingRestaurant = restaurant
+                }
+                .navigationDestination(item: $pendingRestaurant) { restaurant in
+                    RestaurantDetailView(
+                        restaurantStore: restaurantStore,
+                        restaurantID: restaurant.id,
+                        onAddVisit: { visit in
+                            saveVisit(for: restaurant.id, visit: visit)
+                            pendingRestaurant = nil
+                        },
+                        onCancel: {
+                            pendingRestaurant = nil
+                        }
+                    )
+                }
             }
             .tabItem {
                 Image(systemName: "list.bullet.rectangle")
@@ -52,6 +76,15 @@ struct ContentView: View {
                 Image(systemName: "questionmark.circle")
                 Text("About")
             }
+        }
+    }
+
+    // Always append visit to the up-to-date restaurant in the store!
+    private func saveVisit(for restaurantID: String, visit: Visit) {
+        if let current = restaurantStore.restaurants.first(where: { $0.id == restaurantID }) {
+            var updated = current
+            updated.visits.append(visit)
+            restaurantStore.addOrUpdateRestaurant(updated)
         }
     }
 }

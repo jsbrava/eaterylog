@@ -9,6 +9,8 @@
 import SwiftUI
 import CoreLocation
 
+// ... top omitted for brevity ...
+
 struct NearbyRestaurantsView: View {
     @ObservedObject var viewModel: PlacesAutocompleteViewModel
     @ObservedObject var restaurantStore: RestaurantStore
@@ -45,7 +47,13 @@ struct NearbyRestaurantsView: View {
                     }()
 
                     Button(action: {
-                        onSelect(suggestion)
+                        // Build and ensure in store, then navigate
+                        restaurantStore.buildRestaurant(from: suggestion) { restaurant in
+                            if restaurantStore.restaurants.first(where: { $0.id == restaurant.id }) == nil {
+                                restaurantStore.addOrUpdateRestaurant(restaurant)
+                            }
+                            onSelect(suggestion)
+                        }
                     }) {
                         Text(suggestion.description + distanceString)
                             .fontWeight(isVisited ? .bold : .regular)
@@ -106,7 +114,12 @@ struct NearbyRestaurantsView: View {
                     }()
 
                     Button(action: {
-                        onSelect(suggestion)
+                        restaurantStore.buildRestaurant(from: suggestion) { restaurant in
+                            if restaurantStore.restaurants.first(where: { $0.id == restaurant.id }) == nil {
+                                restaurantStore.addOrUpdateRestaurant(restaurant)
+                            }
+                            onSelect(suggestion)
+                        }
                     }) {
                         Text(suggestion.description + distanceString)
                             .fontWeight(isVisited ? .bold : .regular)
@@ -119,7 +132,6 @@ struct NearbyRestaurantsView: View {
                         .fill(Color(.systemGray6))
                 )
                 .padding(.horizontal, 16)
-                // Remove .frame(maxHeight:) so it uses the remaining space, or adjust as needed
             }
             Spacer()
         }
