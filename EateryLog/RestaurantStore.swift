@@ -36,14 +36,6 @@ class RestaurantStore: ObservableObject {
                             ]
                         )
                     ]
-                ),
-                Restaurant(
-                    name: "Poseidon",
-                    address: "1670 Coast Blvd, Del Mar, CA 92014",
-                    latitude: 32.959386,
-                    longitude: -117.266305,
-                    placeID: "",
-                    visits: []
                 )
             ]
         }

@@ -70,13 +70,25 @@ struct MyRestaurantsView: View {
     }
 
     private func deleteRestaurant(at offsets: IndexSet) {
+        let fileManager = FileManager.default
+        let docURL = fileManager.urls(for: .documentDirectory, in: .userDomainMask)[0]
+
         for index in offsets {
             let restaurant = sortedRestaurants[index]
+
+            // 1. Delete image files
+            for filename in restaurant.imageFileNames {
+                let imageURL = docURL.appendingPathComponent(filename)
+                try? fileManager.removeItem(at: imageURL)
+            }
+
+            // 2. Remove restaurant from the store
             if let actualIndex = restaurantStore.restaurants.firstIndex(where: { $0.id == restaurant.id }) {
                 restaurantStore.restaurants.remove(at: actualIndex)
-                restaurantStore.save()
             }
         }
+
+        restaurantStore.save()
     }
 }
 

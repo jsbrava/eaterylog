@@ -16,6 +16,9 @@ struct Restaurant: Identifiable, Codable, Equatable, Hashable {
     let longitude: Double
     let placeID: String
     var visits: [Visit]
+    
+    /// Local image file names saved to the app's Documents directory.
+    var imageFileNames: [String] = []  // Backward-compatible: new property with default value
 }
 
 struct Visit: Identifiable, Codable, Equatable, Hashable {
@@ -23,7 +26,6 @@ struct Visit: Identifiable, Codable, Equatable, Hashable {
     let date: Date
     var dishes: [Dish]
 
-    // Add this explicit initializer
     init(id: UUID = UUID(), date: Date, dishes: [Dish]) {
         self.id = id
         self.date = date
@@ -38,7 +40,6 @@ struct Dish: Identifiable, Codable, Equatable, Hashable {
     var notes: String
     var rating: Int
 
-    // Explicit initializer with default UUID
     init(id: UUID = UUID(), name: String, orderedBy: String, notes: String, rating: Int) {
         self.id = id
         self.name = name
@@ -47,13 +48,15 @@ struct Dish: Identifiable, Codable, Equatable, Hashable {
         self.rating = rating
     }
 }
+
 struct PlaceSuggestion: Identifiable {
     let id = UUID()
     let description: String
     let placeID: String
-    var latitude: Double?    // <-- Add
+    var latitude: Double?
     var longitude: Double?
 }
+
 extension Restaurant {
     func distance(from userLocation: CLLocation?) -> CLLocationDistance? {
         guard let userLocation = userLocation else { return nil }

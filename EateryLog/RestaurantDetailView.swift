@@ -10,13 +10,12 @@ import SwiftUI
 
 struct RestaurantDetailView: View {
     @ObservedObject var restaurantStore: RestaurantStore
-    let restaurantID: String   // The id (placeID)
+    let restaurantID: String
     
-    // Always get the latest from the store
     var restaurant: Restaurant? {
         restaurantStore.restaurants.first(where: { $0.id == restaurantID })
     }
-    
+
     @State private var dishName = ""
     @State private var orderedBy = ""
     @State private var notes = ""
@@ -24,129 +23,160 @@ struct RestaurantDetailView: View {
     @State private var newDishes: [Dish] = []
     @State private var dishToEdit: EditableDishContext?
     
+    @State private var showingImagePicker = false
+    @State private var imageThumbnails: [UIImage] = []
+
     var onAddVisit: ((Visit) -> Void)? = nil
     var onCancel: (() -> Void)? = nil
 
     var body: some View {
-        VStack(alignment: .leading) {
-            if let restaurant = restaurant {
-                Text(restaurant.name)
-                    .font(.title)
-                    .padding(.bottom)
-                Text(restaurant.address)
-                    .font(.subheadline)
-                    .padding(.bottom)
+        ScrollView {
+            VStack(alignment: .leading, spacing: 16) {
+                if let restaurant = restaurant {
+                    Text(restaurant.name)
+                        .font(.title)
+                    Text(restaurant.address)
+                        .font(.subheadline)
 
-                Text("Previous Visits").font(.headline)
-                List {
-                    ForEach(Array(restaurant.visits.suffix(5).enumerated()), id: \.element.id) { visitIndex, visit in
-                        Section(header: Text("Visit on \(visit.date.formatted(.dateTime.month().day().year()))").font(.subheadline)) {
-                            ForEach(Array(visit.dishes.enumerated()), id: \.element.id) { dishIndex, dish in
-                                VStack(alignment: .leading) {
-                                    HStack {
-                                        Text(dish.name).bold()
-                                        Text("- \(dish.orderedBy)").italic()
-                                        Spacer()
-                                        Text("⭐️ \(dish.rating)")
-                                    }
-                                    if !dish.notes.isEmpty {
-                                        Text(dish.notes)
-                                            .font(.caption)
-                                    }
+                    // Photos section
+                    if !imageThumbnails.isEmpty {
+                        ScrollView(.horizontal, showsIndicators: false) {
+                            HStack {
+                                ForEach(imageThumbnails, id: \.self) { image in
+                                    Image(uiImage: image)
+                                        .resizable()
+                                        .scaledToFill()
+                                        .frame(width: 120, height: 120)
+                                        .clipped()
+                                        .cornerRadius(10)
                                 }
-                                .swipeActions(edge: .trailing) {
-                                    Button(role: .destructive) {
-                                        deleteDish(visitIndex: realVisitIndex(restaurant, visibleIndex: visitIndex), dishIndex: dishIndex)
-                                    } label: {
-                                        Label("Delete", systemImage: "trash")
+                            }
+                            .padding(.vertical)
+                        }
+                    }
+
+                    Button("Add Photo") {
+                        showingImagePicker = true
+                    }
+
+                    Text("Previous Visits").font(.headline)
+
+                    // List is not scrollable inside ScrollView – embed as a fixed-height LazyVStack
+                    VStack {
+                        ForEach(Array(restaurant.visits.suffix(5).enumerated()), id: \.element.id) { visitIndex, visit in
+                            Section(header: Text("Visit on \(visit.date.formatted(.dateTime.month().day().year()))").font(.subheadline)) {
+                                ForEach(Array(visit.dishes.enumerated()), id: \.element.id) { dishIndex, dish in
+                                    VStack(alignment: .leading) {
+                                        HStack {
+                                            Text(dish.name).bold()
+                                            Text("- \(dish.orderedBy)").italic()
+                                            Spacer()
+                                            Text("⭐️ \(dish.rating)")
+                                        }
+                                        if !dish.notes.isEmpty {
+                                            Text(dish.notes)
+                                                .font(.caption)
+                                        }
                                     }
-                                    Button {
-                                        dishToEdit = EditableDishContext(
-                                            visitIndex: realVisitIndex(restaurant, visibleIndex: visitIndex),
-                                            dish: dish
-                                        )
-                                    } label: {
-                                        Label("Edit", systemImage: "pencil")
+                                    .swipeActions(edge: .trailing) {
+                                        Button(role: .destructive) {
+                                            deleteDish(visitIndex: realVisitIndex(restaurant, visibleIndex: visitIndex), dishIndex: dishIndex)
+                                        } label: {
+                                            Label("Delete", systemImage: "trash")
+                                        }
+                                        Button {
+                                            dishToEdit = EditableDishContext(
+                                                visitIndex: realVisitIndex(restaurant, visibleIndex: visitIndex),
+                                                dish: dish
+                                            )
+                                        } label: {
+                                            Label("Edit", systemImage: "pencil")
+                                        }
                                     }
                                 }
                             }
                         }
                     }
-                }
-                .frame(height: 200)
-                .sheet(item: $dishToEdit) { editableContext in
-                    EditDishView(
-                        dish: editableContext.dish,
-                        onSave: { updatedDish in
-                            editDish(visitIndex: editableContext.visitIndex, updatedDish: updatedDish)
-                            dishToEdit = nil
-                        },
-                        onCancel: {
-                            dishToEdit = nil
-                        }
-                    )
-                }
+                    .frame(maxWidth: .infinity)
+                    .sheet(item: $dishToEdit) { editableContext in
+                        EditDishView(
+                            dish: editableContext.dish,
+                            onSave: { updatedDish in
+                                editDish(visitIndex: editableContext.visitIndex, updatedDish: updatedDish)
+                                dishToEdit = nil
+                            },
+                            onCancel: {
+                                dishToEdit = nil
+                            }
+                        )
+                    }
 
-                Divider().padding(.vertical)
+                    Divider().padding(.vertical)
 
-                Text("Add a Dish to This Visit").font(.headline)
-                TextField("Dish Name", text: $dishName)
-                    .textFieldStyle(.roundedBorder)
-                TextField("Ordered By", text: $orderedBy)
-                    .textFieldStyle(.roundedBorder)
-                TextField("Notes", text: $notes)
-                    .textFieldStyle(.roundedBorder)
-                Stepper("Rating: \(rating)", value: $rating, in: 0...5)
+                    Text("Add a Dish to This Visit").font(.headline)
+                    TextField("Dish Name", text: $dishName)
+                        .textFieldStyle(.roundedBorder)
+                    TextField("Ordered By", text: $orderedBy)
+                        .textFieldStyle(.roundedBorder)
+                    TextField("Notes", text: $notes)
+                        .textFieldStyle(.roundedBorder)
+                    Stepper("Rating: \(rating)", value: $rating, in: 0...5)
 
-                Button("Add Dish") {
-                    let newDish = Dish(name: dishName, orderedBy: orderedBy, notes: notes, rating: rating)
-                    newDishes.append(newDish)
-                    dishName = ""
-                    orderedBy = ""
-                    notes = ""
-                    rating = 0
-                }
-                .padding(.vertical)
+                    Button("Add Dish") {
+                        let newDish = Dish(name: dishName, orderedBy: orderedBy, notes: notes, rating: rating)
+                        newDishes.append(newDish)
+                        dishName = ""
+                        orderedBy = ""
+                        notes = ""
+                        rating = 0
+                    }
+                    .padding(.vertical)
 
-                if !newDishes.isEmpty {
-                    Text("Dishes for This Visit:").font(.subheadline)
-                    ForEach(newDishes) { dish in
-                        HStack {
-                            Text(dish.name)
-                            Spacer()
-                            Text("⭐️ \(dish.rating)")
+                    if !newDishes.isEmpty {
+                        Text("Dishes for This Visit:").font(.subheadline)
+                        ForEach(newDishes) { dish in
+                            HStack {
+                                Text(dish.name)
+                                Spacer()
+                                Text("⭐️ \(dish.rating)")
+                            }
                         }
                     }
-                }
 
-                Button("Save Visit") {
-                    let newVisit = Visit(date: Date(), dishes: newDishes)
-                    if let onAddVisit = onAddVisit {
-                        onAddVisit(newVisit)
-                    } else {
-                        restaurantStore.addVisit(to: restaurant, visit: newVisit)
+                    Button("Save Visit") {
+                        let newVisit = Visit(date: Date(), dishes: newDishes)
+                        if let onAddVisit = onAddVisit {
+                            onAddVisit(newVisit)
+                        } else {
+                            restaurantStore.addVisit(to: restaurant, visit: newVisit)
+                        }
+                        newDishes = []
                     }
-                    newDishes = []
+                    .disabled(newDishes.isEmpty)
+                    .padding(.top)
+                } else {
+                    Text("Restaurant not found.")
+                        .foregroundColor(.secondary)
                 }
-                .disabled(newDishes.isEmpty)
-                .padding(.top)
-
-                Spacer()
-            } else {
-                Text("Restaurant not found.").foregroundColor(.secondary)
+            }
+            .padding()
+        }
+        .sheet(isPresented: $showingImagePicker) {
+            ImagePicker { selectedImage in
+                saveImage(selectedImage)
             }
         }
-        .padding()
+        .onAppear {
+            loadImages()
+        }
     }
     
-    // Helper: Convert visible visit index to real index
     private func realVisitIndex(_ restaurant: Restaurant, visibleIndex: Int) -> Int {
         let allVisits = restaurant.visits
         let lastFive = allVisits.suffix(5)
         return allVisits.count - lastFive.count + visibleIndex
     }
-    
-    // Delete Dish Handler
+
     private func deleteDish(visitIndex: Int, dishIndex: Int) {
         guard let restaurant = restaurant else { return }
         var updatedRestaurant = restaurant
@@ -161,7 +191,6 @@ struct RestaurantDetailView: View {
         restaurantStore.updateRestaurant(updatedRestaurant)
     }
 
-    // Edit Dish Handler
     private func editDish(visitIndex: Int, updatedDish: Dish) {
         guard let restaurant = restaurant else { return }
         var updatedRestaurant = restaurant
@@ -173,8 +202,33 @@ struct RestaurantDetailView: View {
             restaurantStore.updateRestaurant(updatedRestaurant)
         }
     }
-}
 
+    // MARK: - Image Support
+
+    private func saveImage(_ image: UIImage) {
+        guard let restaurant = restaurant else { return }
+        guard let data = image.jpegData(compressionQuality: 0.8) else { return }
+        let filename = UUID().uuidString + ".jpg"
+        let url = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0].appendingPathComponent(filename)
+        try? data.write(to: url)
+
+        var updatedRestaurant = restaurant
+        updatedRestaurant.imageFileNames.append(filename)
+        restaurantStore.updateRestaurant(updatedRestaurant)
+        imageThumbnails.append(image)
+    }
+
+    private func loadImages() {
+        guard let restaurant = restaurant else { return }
+        let docURL = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0]
+        imageThumbnails = restaurant.imageFileNames.compactMap { filename in
+            let url = docURL.appendingPathComponent(filename)
+            guard let data = try? Data(contentsOf: url),
+                  let image = UIImage(data: data) else { return nil }
+            return image
+        }
+    }
+}
 struct EditableDishContext: Identifiable {
     var id: UUID { dish.id }
     let visitIndex: Int
