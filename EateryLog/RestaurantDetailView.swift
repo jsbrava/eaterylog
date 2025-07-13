@@ -25,6 +25,7 @@ struct RestaurantDetailView: View {
     
     @State private var showingImagePicker = false
     @State private var imageThumbnails: [UIImage] = []
+    @State private var selectedImageIndex: Int? = nil  // <-- NEW
 
     var onAddVisit: ((Visit) -> Void)? = nil
     var onCancel: (() -> Void)? = nil
@@ -42,13 +43,17 @@ struct RestaurantDetailView: View {
                     if !imageThumbnails.isEmpty {
                         ScrollView(.horizontal, showsIndicators: false) {
                             HStack {
-                                ForEach(imageThumbnails, id: \.self) { image in
+                                ForEach(imageThumbnails.indices, id: \.self) { index in
+                                    let image = imageThumbnails[index]
                                     Image(uiImage: image)
                                         .resizable()
                                         .scaledToFill()
                                         .frame(width: 120, height: 120)
                                         .clipped()
                                         .cornerRadius(10)
+                                        .onTapGesture {
+                                            selectedImageIndex = index  // <-- NEW
+                                        }
                                 }
                             }
                             .padding(.vertical)
@@ -61,7 +66,6 @@ struct RestaurantDetailView: View {
 
                     Text("Previous Visits").font(.headline)
 
-                    // List is not scrollable inside ScrollView – embed as a fixed-height LazyVStack
                     VStack {
                         ForEach(Array(restaurant.visits.suffix(5).enumerated()), id: \.element.id) { visitIndex, visit in
                             Section(header: Text("Visit on \(visit.date.formatted(.dateTime.month().day().year()))").font(.subheadline)) {
@@ -166,11 +170,47 @@ struct RestaurantDetailView: View {
                 saveImage(selectedImage)
             }
         }
+        .fullScreenCover(item: Binding(
+            get: { selectedImageIndex.map { ImageWrapper(index: $0) } },
+            set: { selectedImageIndex = $0?.index }
+        )) { wrapper in
+            if let image = imageThumbnails[safe: wrapper.index] {
+                ZStack(alignment: .topTrailing) {
+                    Color.black.ignoresSafeArea()
+                    
+                    VStack {
+                        Image(uiImage: image)
+                            .resizable()
+                            .scaledToFit()
+                            .padding()
+
+                        Button("Close") {
+                            selectedImageIndex = nil
+                        }
+                        .padding()
+                        .foregroundColor(.white)
+                    }
+
+                    Button {
+                        deleteImage(at: wrapper.index)
+                        selectedImageIndex = nil
+                    } label: {
+                        Image(systemName: "trash")
+                            .foregroundColor(.white)
+                            .padding()
+                            .background(Color.red.opacity(0.9))
+                            .clipShape(Circle())
+                    }
+                    .padding(.top, 40)
+                    .padding(.trailing)
+                }
+            }
+        }
         .onAppear {
             loadImages()
         }
     }
-    
+
     private func realVisitIndex(_ restaurant: Restaurant, visibleIndex: Int) -> Int {
         let allVisits = restaurant.visits
         let lastFive = allVisits.suffix(5)
@@ -228,9 +268,38 @@ struct RestaurantDetailView: View {
             return image
         }
     }
+
+    private func deleteImage(at index: Int) {
+        guard let restaurant = restaurant else { return }
+        guard index < restaurant.imageFileNames.count else { return }
+
+        let filename = restaurant.imageFileNames[index]
+        let url = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0].appendingPathComponent(filename)
+        try? FileManager.default.removeItem(at: url)
+
+        var updatedRestaurant = restaurant
+        updatedRestaurant.imageFileNames.remove(at: index)
+        restaurantStore.updateRestaurant(updatedRestaurant)
+
+        imageThumbnails.remove(at: index)
+    }
 }
+
+// MARK: - Helpers
+
 struct EditableDishContext: Identifiable {
     var id: UUID { dish.id }
     let visitIndex: Int
     var dish: Dish
+}
+
+struct ImageWrapper: Identifiable {
+    let index: Int
+    var id: Int { index }
+}
+
+extension Collection {
+    subscript(safe index: Index) -> Element? {
+        indices.contains(index) ? self[index] : nil
+    }
 }
