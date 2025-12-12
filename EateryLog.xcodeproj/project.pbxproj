@@ -6,6 +6,10 @@
 	objectVersion = 77;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		38333A022E31A5EA007246F0 /* ZIPFoundation in Frameworks */ = {isa = PBXBuildFile; productRef = 38333A012E31A5EA007246F0 /* ZIPFoundation */; };
+/* End PBXBuildFile section */
+
 /* Begin PBXContainerItemProxy section */
 		38EAF1BB2DE3F8AC00D4EA9E /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -77,6 +81,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				38333A022E31A5EA007246F0 /* ZIPFoundation in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -97,12 +102,20 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		38333A002E31A5EA007246F0 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
 		38EAF1A42DE3F8AA00D4EA9E = {
 			isa = PBXGroup;
 			children = (
 				38EAF1AF2DE3F8AA00D4EA9E /* EateryLog */,
 				38EAF1BD2DE3F8AC00D4EA9E /* EateryLogTests */,
 				38EAF1C72DE3F8AC00D4EA9E /* FoodTracker2UITests */,
+				38333A002E31A5EA007246F0 /* Frameworks */,
 				38EAF1AE2DE3F8AA00D4EA9E /* Products */,
 			);
 			sourceTree = "<group>";
@@ -137,6 +150,7 @@
 			);
 			name = EateryLog;
 			packageProductDependencies = (
+				38333A012E31A5EA007246F0 /* ZIPFoundation */,
 			);
 			productName = FoodTracker2;
 			productReference = 38EAF1AD2DE3F8AA00D4EA9E /* EateryLog.app */;
@@ -220,6 +234,9 @@
 			);
 			mainGroup = 38EAF1A42DE3F8AA00D4EA9E;
 			minimizedProjectReferenceProxies = 1;
+			packageReferences = (
+				383339FF2E319FD3007246F0 /* XCRemoteSwiftPackageReference "ZIPFoundation" */,
+			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 38EAF1AE2DE3F8AA00D4EA9E /* Products */;
 			projectDirPath = "";
@@ -579,6 +596,25 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		383339FF2E319FD3007246F0 /* XCRemoteSwiftPackageReference "ZIPFoundation" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/weichsel/ZIPFoundation.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 0.9.19;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		38333A012E31A5EA007246F0 /* ZIPFoundation */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 383339FF2E319FD3007246F0 /* XCRemoteSwiftPackageReference "ZIPFoundation" */;
+			productName = ZIPFoundation;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = 38EAF1A52DE3F8AA00D4EA9E /* Project object */;
 }
