@@ -2,6 +2,7 @@
 #
 # gitignore contributors: remember to update Global/Xcode.gitignore, Objective-C.gitignore & Swift.gitignore
 
+
 ## User settings
 xcuserdata/
 
@@ -61,3 +62,11 @@ fastlane/Preview.html
 fastlane/screenshots/**/*.png
 fastlane/test_output
 .DS_Store
+
+# Secrets
+Secrets.xcconfig
+EateryLog/Secrets.xcconfig
+
+# Xcode build artifacts
+DerivedData/
+build/

@@ -9,6 +9,9 @@ import SwiftUI
 
 @main
 struct EateryLogApp: App {
+    init() {
+        print("Places key length:", AppConfig.googlePlacesAPIKey.count)
+    }
     @StateObject private var store = RestaurantStore()
     var body: some Scene {
         WindowGroup {

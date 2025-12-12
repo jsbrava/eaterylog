@@ -5,8 +5,20 @@
 //  Created by jim on 5/29/25.
 //
 
+import Foundation
 
 struct AppConfig {
-    static let googlePlacesAPIKey = "AIzaSyAaU1D8OIZDKpy5b1UTU_ej1hW2BG1um7E"
-    // Add any other app-wide constants here
+    static var googlePlacesAPIKey: String {
+        guard
+            let key = Bundle.main.object(
+                forInfoDictionaryKey: "GOOGLE_PLACES_API_KEY"
+            ) as? String,
+            !key.isEmpty
+        else {
+            assertionFailure("Missing GOOGLE_PLACES_API_KEY")
+            return ""
+        }
+        return key
+    }
 }
+
