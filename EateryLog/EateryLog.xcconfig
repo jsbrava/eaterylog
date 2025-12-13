@@ -1,0 +1,8 @@
+//
+//  EateryLog.xcconfig
+//  EateryLog
+//
+//  Created by jim on 12/12/25.
+//
+
+#include "EateryLog/Secrets.xcconfig"

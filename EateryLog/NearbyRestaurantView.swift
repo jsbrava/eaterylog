@@ -138,6 +138,7 @@ struct NearbyRestaurantsView: View {
         .frame(maxHeight: .infinity, alignment: .top)
         .padding(.top, 8)
         .onAppear {
+            //print("Nearby onAppear – location is:", //locationManager.location as Any)
             if !hasFetched {
                 hasFetched = true
                 if let location = locationManager.location {
@@ -146,6 +147,7 @@ struct NearbyRestaurantsView: View {
             }
         }
         .onReceive(locationManager.$location) { newLocation in
+            //print("Nearby location update:", newLocation as Any)
             guard let newLocation = newLocation else { return }
             if lastFetchedLocation == nil || lastFetchedLocation!.distance(from: newLocation) > 100 {
                 lastFetchedLocation = newLocation

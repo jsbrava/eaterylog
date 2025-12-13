@@ -79,51 +79,90 @@ class PlacesAutocompleteViewModel: ObservableObject {
             print("No location available, skipping fetch.")
             return
         }
+
         let lat = location.coordinate.latitude
         let lng = location.coordinate.longitude
+
         let urlString =
-            "https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=\(lat),\(lng)&rankby=distance&type=restaurant&key=\(apiKey)"
-        guard let url = URL(string: urlString) else { return }
+            "https://maps.googleapis.com/maps/api/place/nearbysearch/json" +
+            "?location=\(lat),\(lng)" +
+            "&rankby=distance" +
+            "&type=restaurant" +
+            "&key=\(apiKey)"
+
+        guard let url = URL(string: urlString) else {
+            print("Nearby: invalid URL")
+            return
+        }
+
+        // print("Nearby URL:", urlString)
 
         URLSession.shared.dataTask(with: url) { data, response, error in
+            if let http = response as? HTTPURLResponse {
+                print("Nearby HTTP status:", http.statusCode)
+            }
+
             if let error = error {
-                print("Network error: \(error.localizedDescription)")
+                print("Nearby network error:", error.localizedDescription)
                 return
             }
-            guard let data = data else { return }
-            do {
-                if let json = try JSONSerialization.jsonObject(with: data) as? [String: Any],
-                   let results = json["results"] as? [[String: Any]] {
-                    let suggestions: [PlaceSuggestion] = results.prefix(8).compactMap { place in
-                        guard let name = place["name"] as? String,
-                              let placeID = place["place_id"] as? String,
-                              let geometry = place["geometry"] as? [String: Any],
-                              let locationDict = geometry["location"] as? [String: Any],
-                              let lat = locationDict["lat"] as? Double,
-                              let lng = locationDict["lng"] as? Double
-                        else { return nil }
-                        var suggestion = PlaceSuggestion(description: name, placeID: placeID)
-                        suggestion.latitude = lat
-                        suggestion.longitude = lng
-                        return suggestion
-                    }
 
-                    // Sort by distance from user's location
-                    let sortedSuggestions = suggestions.sorted { a, b in
-                        guard let alat = a.latitude, let alng = a.longitude,
-                              let blat = b.latitude, let blng = b.longitude else { return false }
-                        let aloc = CLLocation(latitude: alat, longitude: alng)
-                        let bloc = CLLocation(latitude: blat, longitude: blng)
-                        return location.distance(from: aloc) < location.distance(from: bloc)
-                    }
-                    DispatchQueue.main.async {
-                        self.suggestions = sortedSuggestions
-                    }
+            guard let data = data else {
+                print("Nearby: no data returned")
+                return
+            }
+
+            do {
+                guard let json = try JSONSerialization.jsonObject(with: data) as? [String: Any] else {
+                    print("Nearby: response was not a JSON dictionary")
+                    return
+                }
+
+                if let status = json["status"] as? String {
+                    print("Nearby Google status:", status,
+                          "error_message:", json["error_message"] as? String ?? "none")
+                }
+
+                guard let results = json["results"] as? [[String: Any]] else {
+                    print("Nearby: missing 'results' in response")
+                    return
+                }
+
+                let suggestions: [PlaceSuggestion] = results.prefix(8).compactMap { place in
+                    guard
+                        let name = place["name"] as? String,
+                        let placeID = place["place_id"] as? String,
+                        let geometry = place["geometry"] as? [String: Any],
+                        let locationDict = geometry["location"] as? [String: Any],
+                        let lat = locationDict["lat"] as? Double,
+                        let lng = locationDict["lng"] as? Double
+                    else { return nil }
+
+                    var suggestion = PlaceSuggestion(description: name, placeID: placeID)
+                    suggestion.latitude = lat
+                    suggestion.longitude = lng
+                    return suggestion
+                }
+
+                let sortedSuggestions = suggestions.sorted { a, b in
+                    guard
+                        let alat = a.latitude, let alng = a.longitude,
+                        let blat = b.latitude, let blng = b.longitude
+                    else { return false }
+
+                    let aloc = CLLocation(latitude: alat, longitude: alng)
+                    let bloc = CLLocation(latitude: blat, longitude: blng)
+                    return location.distance(from: aloc) < location.distance(from: bloc)
+                }
+
+                DispatchQueue.main.async {
+                    self.suggestions = sortedSuggestions
                 }
             } catch {
-                print("JSON error: \(error.localizedDescription)")
+                print("Nearby JSON error:", error.localizedDescription)
             }
-        }.resume()
+        }
+        .resume()
     }
     func fetchPlaceDetails(placeID: String, completion: @escaping (String, Double, Double) -> Void) {
         let apiKey = AppConfig.googlePlacesAPIKey

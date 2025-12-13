@@ -313,6 +313,8 @@
 /* Begin XCBuildConfiguration section */
 		38EAF1CC2DE3F8AC00D4EA9E /* Debug */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReferenceAnchor = 38EAF1AF2DE3F8AA00D4EA9E /* EateryLog */;
+			baseConfigurationReferenceRelativePath = EateryLog.xcconfig;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
@@ -376,6 +378,8 @@
 		};
 		38EAF1CD2DE3F8AC00D4EA9E /* Release */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReferenceAnchor = 38EAF1AF2DE3F8AA00D4EA9E /* EateryLog */;
+			baseConfigurationReferenceRelativePath = EateryLog.xcconfig;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
